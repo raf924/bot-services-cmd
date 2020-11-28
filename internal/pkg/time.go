@@ -28,6 +28,14 @@ type TimeCommand struct {
 	WeatherCommand
 }
 
+func (t *TimeCommand) Name() string {
+	return "time"
+}
+
+func (t *TimeCommand) Aliases() []string {
+	return []string{"t"}
+}
+
 func (t *TimeCommand) Execute(command *messages.CommandPacket) (*messages.BotPacket, error) {
 	if len(command.Args) == 0 {
 		return nil, fmt.Errorf("missing arguments")
