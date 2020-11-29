@@ -36,7 +36,7 @@ func (t *TimeCommand) Aliases() []string {
 	return []string{"t"}
 }
 
-func (t *TimeCommand) Execute(command *messages.CommandPacket) (*messages.BotPacket, error) {
+func (t *TimeCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
 	if len(command.Args) == 0 {
 		return nil, fmt.Errorf("missing arguments")
 	}
@@ -53,10 +53,12 @@ func (t *TimeCommand) Execute(command *messages.CommandPacket) (*messages.BotPac
 		return nil, fmt.Errorf("parse weather error: %s", err)
 	}
 	locTime := time.Now().UTC().In(time.FixedZone("", int(timeData.Weather[0].Timezone*60*60)))
-	return &messages.BotPacket{
-		Timestamp: timestamppb.Now(),
-		Message:   fmt.Sprintf("%s - %s", locTime.Format("03:04:04 PM"), timeData.Weather[0].Location),
-		Recipient: command.GetUser(),
-		Private:   command.GetPrivate(),
+	return []*messages.BotPacket{
+		{
+			Timestamp: timestamppb.Now(),
+			Message:   fmt.Sprintf("%s - %s", locTime.Format("03:04:04 PM"), timeData.Weather[0].Location),
+			Recipient: command.GetUser(),
+			Private:   command.GetPrivate(),
+		},
 	}, nil
 }

@@ -58,7 +58,7 @@ func (w *WeatherCommand) Aliases() []string {
 	return []string{"w"}
 }
 
-func (w *WeatherCommand) Execute(command *messages.CommandPacket) (*messages.BotPacket, error) {
+func (w *WeatherCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
 	if len(command.Args) == 0 {
 		return nil, nil
 	}
@@ -93,10 +93,12 @@ func (w *WeatherCommand) Execute(command *messages.CommandPacket) (*messages.Bot
 		}
 		text += fmt.Sprintf("%s: %0.1f°%s to %0.1f°%s - %s\n", forecast.Day, forecast.Low, degreeType, forecast.High, degreeType, forecast.Sky)
 	}
-	return &messages.BotPacket{
-		Timestamp: timestamppb.Now(),
-		Message:   text,
-		Recipient: command.User,
-		Private:   command.GetPrivate(),
+	return []*messages.BotPacket{
+		{
+			Timestamp: timestamppb.Now(),
+			Message:   text,
+			Recipient: command.User,
+			Private:   command.GetPrivate(),
+		},
 	}, nil
 }
