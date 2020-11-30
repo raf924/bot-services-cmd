@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/raf924/bot-weather-cmd/internal/pkg"
+	"github.com/raf924/bot-services-cmd/internal/pkg"
 	"github.com/raf924/bot/api/messages"
 	"os"
 	"os/user"
@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	packet, err := wcmd.Execute(&messages.CommandPacket{
+	_, err = wcmd.Execute(&messages.CommandPacket{
 		Timestamp: nil,
 		Command:   "",
 		Args:      os.Args[1:],
@@ -32,5 +32,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	print(packet.Message)
 }
