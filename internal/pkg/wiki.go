@@ -20,7 +20,7 @@ func init() {
 	bot.HandleCommand(&WikiCommand{})
 }
 
-type SearchResponse struct {
+type WikiSearchResponse struct {
 	XMLName xml.Name `xml:"api"`
 	Query   struct {
 		Suggestion []struct {
@@ -30,7 +30,7 @@ type SearchResponse struct {
 	} `xml:"query"`
 }
 
-type InfoResponse struct {
+type WikiInfoResponse struct {
 	XMLName xml.Name `xml:"api"`
 	Query   struct {
 		Pages []struct {
@@ -41,7 +41,7 @@ type InfoResponse struct {
 	} `xml:"query"`
 }
 
-type ExtractResponse struct {
+type WikiExtractResponse struct {
 	XMLName xml.Name `xml:"api"`
 	Query   struct {
 		Pages []struct {
@@ -74,7 +74,7 @@ func (w *WikiCommand) Aliases() []string {
 	return []string{}
 }
 
-func (w *WikiCommand) search(search string) (*SearchResponse, error) {
+func (w *WikiCommand) search(search string) (*WikiSearchResponse, error) {
 	queryURL := *w.wikiUrl
 	wikiQuery := queryURL.Query()
 	wikiQuery.Set("srsearch", search)
@@ -90,7 +90,7 @@ func (w *WikiCommand) search(search string) (*SearchResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	var searchResponse SearchResponse
+	var searchResponse WikiSearchResponse
 	err = xml.NewDecoder(response.Body).Decode(&searchResponse)
 	if err != nil {
 		return nil, err
@@ -98,8 +98,8 @@ func (w *WikiCommand) search(search string) (*SearchResponse, error) {
 	return &searchResponse, nil
 }
 
-func (w *WikiCommand) info(pageId int) (*InfoResponse, error) {
-	var infoResponse InfoResponse
+func (w *WikiCommand) info(pageId int) (*WikiInfoResponse, error) {
+	var infoResponse WikiInfoResponse
 	infoUrl := *w.wikiUrl
 	wikiQuery := infoUrl.Query()
 	wikiQuery.Set("prop", "info")
@@ -122,8 +122,8 @@ func (w *WikiCommand) info(pageId int) (*InfoResponse, error) {
 	return &infoResponse, nil
 }
 
-func (w *WikiCommand) extract(pageId int) (*ExtractResponse, error) {
-	var extractResponse ExtractResponse
+func (w *WikiCommand) extract(pageId int) (*WikiExtractResponse, error) {
+	var extractResponse WikiExtractResponse
 	extractUrl := *w.wikiUrl
 	wikiQuery := extractUrl.Query()
 	wikiQuery.Set("prop", "extracts")
