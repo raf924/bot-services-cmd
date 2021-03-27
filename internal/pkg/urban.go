@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/raf924/bot/api/messages"
-	"github.com/raf924/bot/pkg/bot"
 	"github.com/raf924/bot/pkg/bot/command"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"math"
@@ -13,10 +12,6 @@ import (
 	"strings"
 	"time"
 )
-
-func init() {
-	bot.HandleCommand(&UrbanCommand{})
-}
 
 type urbanData struct {
 	Definition string `json:"definition"`

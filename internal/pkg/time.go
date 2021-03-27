@@ -4,17 +4,12 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/raf924/bot/api/messages"
-	"github.com/raf924/bot/pkg/bot"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 )
-
-func init() {
-	bot.HandleCommand(&TimeCommand{})
-}
 
 type timeResponse struct {
 	XMLName xml.Name `xml:"weatherdata"`

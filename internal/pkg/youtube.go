@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gocolly/colly/v2"
 	"github.com/raf924/bot/api/messages"
-	"github.com/raf924/bot/pkg/bot"
 	"github.com/raf924/bot/pkg/bot/command"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
@@ -13,10 +12,6 @@ import (
 	"log"
 	"regexp"
 )
-
-func init() {
-	bot.HandleCommand(&YoutubeCommand{})
-}
 
 var ytRegex = regexp.MustCompile(`(?i)(?:youtube\.com/\S*(?:(?:/e(?:mbed))?/|watch\?(?:\S*?&?v=))|youtu\.be/)([a-zA-Z0-9_-]{6,11})`)
 

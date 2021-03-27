@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/raf924/bot/api/messages"
-	"github.com/raf924/bot/pkg/bot"
 	"github.com/raf924/bot/pkg/bot/command"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/http"
@@ -14,10 +13,6 @@ import (
 
 const defaultDegreeType = "C"
 const maxDays = 3
-
-func init() {
-	bot.HandleCommand(&WeatherCommand{})
-}
 
 type weatherResponse struct {
 	XMLName xml.Name `xml:"weatherdata"`
