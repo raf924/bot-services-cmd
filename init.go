@@ -11,9 +11,9 @@ import (
 func init() {
 	bot.HandleCommand(&pkg.SearchCommand{})
 	bot.HandleCommand(&pkg.DictionaryCommand{})
-	bot.HandleCommand(&pkg.SearchCommand{})
 	bot.HandleCommand(&pkg.TimeCommand{})
 	bot.HandleCommand(&pkg.WeatherCommand{})
 	bot.HandleCommand(&pkg.YoutubeCommand{})
+	bot.HandleCommand(&pkg.UrbanCommand{})
 	bot.HandleCommand(&pkg.WikiCommand{})
 }
