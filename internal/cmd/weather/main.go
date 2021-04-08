@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/raf924/bot-services-cmd/internal/pkg"
-	"github.com/raf924/bot/api/messages"
+	messages "github.com/raf924/connector-api/pkg/gen"
 	"os"
 	"os/user"
 )

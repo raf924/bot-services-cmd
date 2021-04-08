@@ -3,7 +3,7 @@ package pkg
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/raf924/bot/api/messages"
+	messages "github.com/raf924/connector-api/pkg/gen"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/http"
 	"net/url"
