@@ -15,4 +15,5 @@ func init() {
 	bot.HandleCommand(&pkg.YoutubeCommand{})
 	bot.HandleCommand(&pkg.UrbanCommand{})
 	bot.HandleCommand(&pkg.WikiCommand{})
+	bot.HandleCommand(&pkg.JokeCommand{})
 }
