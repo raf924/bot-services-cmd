@@ -66,6 +66,7 @@ func (j *JokeCommand) fetchFromReddit() (string, error) {
 
 func (j *JokeCommand) fetchDadJoke() (string, error) {
 	req, _ := http.NewRequest("GET", "https://icanhazdadjoke.com/", nil)
+	req.Header.Set("Accept", "text/plain")
 	req.Header.Set("User-Agent", "TBotT (https://github.com/raf924/bot-services-cmd)")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
