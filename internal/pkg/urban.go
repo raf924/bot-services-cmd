@@ -62,6 +62,9 @@ func (u *UrbanCommand) Execute(command *messages.CommandPacket) ([]*messages.Bot
 	if err != nil {
 		return nil, err
 	}
+	if len(urbanResponse.List) == 0 {
+		return nil, nil
+	}
 	definition := urbanResponse.List[0].Definition
 	size := int(math.Min(500, float64(len(definition))))
 	return []*messages.BotPacket{
