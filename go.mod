@@ -7,5 +7,5 @@ require (
 	github.com/raf924/bot v1.0.0-alpha.23
 	github.com/raf924/connector-api v1.0.0-alpha.9
 	google.golang.org/api v0.49.0
-	google.golang.org/protobuf v1.27.0
+	google.golang.org/protobuf v1.27.1
 )
