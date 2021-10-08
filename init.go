@@ -5,8 +5,6 @@ import (
 	"github.com/raf924/bot/pkg/bot"
 )
 
-//Side effects
-
 func init() {
 	bot.HandleCommand(&pkg.SearchCommand{})
 	bot.HandleCommand(&pkg.DictionaryCommand{})

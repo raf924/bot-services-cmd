@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/raf924/bot/pkg/bot/command"
-	messages "github.com/raf924/connector-api/pkg/gen"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/raf924/bot/pkg/domain"
 	"math"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 )
+
+var _ command.Command = (*UrbanCommand)(nil)
 
 type urbanData struct {
 	Definition string `json:"definition"`
@@ -45,11 +46,11 @@ func (u *UrbanCommand) Aliases() []string {
 	return []string{"u"}
 }
 
-func (u *UrbanCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
+func (u *UrbanCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
 	urbanRequest := *u.urbanRequest
 	urbanURL := *urbanRequest.URL
 	urbanQuery := urbanURL.Query()
-	urbanQuery.Set("term", strings.Join(command.GetArgs(), "+"))
+	urbanQuery.Set("term", strings.Join(command.Args(), "+"))
 	urbanURL.RawQuery = urbanQuery.Encode()
 	urbanRequest.URL = &urbanURL
 	netClient := http.Client{Timeout: time.Second * 30}
@@ -67,12 +68,11 @@ func (u *UrbanCommand) Execute(command *messages.CommandPacket) ([]*messages.Bot
 	}
 	definition := urbanResponse.List[0].Definition
 	size := int(math.Min(500, float64(len(definition))))
-	return []*messages.BotPacket{
-		{
-			Timestamp: timestamppb.Now(),
-			Message:   fmt.Sprintf("%s - %s", urbanResponse.List[0].Definition[0:size], urbanResponse.List[0].PermaLink),
-			Recipient: command.GetUser(),
-			Private:   command.GetPrivate(),
-		},
+	return []*domain.ClientMessage{
+		domain.NewClientMessage(
+			fmt.Sprintf("%s - %s", urbanResponse.List[0].Definition[0:size], urbanResponse.List[0].PermaLink),
+			command.Sender(),
+			command.Private(),
+		),
 	}, nil
 }

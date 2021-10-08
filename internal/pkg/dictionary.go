@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/raf924/bot/pkg/bot/command"
-	messages "github.com/raf924/connector-api/pkg/gen"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/raf924/bot/pkg/domain"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"time"
 )
+
+var _ command.Command = (*DictionaryCommand)(nil)
 
 type DictionaryResponse []struct {
 	Word      string `json:"word"`
@@ -52,9 +53,9 @@ func (d *DictionaryCommand) Aliases() []string {
 	return []string{"d", "define", "dict"}
 }
 
-func (d *DictionaryCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
+func (d *DictionaryCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
 	dU := *d.dictionaryUrl
-	dU.Path = path.Join("api", "v2", "entries", "en", url.PathEscape(strings.Join(command.GetArgs(), " ")))
+	dU.Path = path.Join("api", "v2", "entries", "en", url.PathEscape(strings.Join(command.Args(), " ")))
 	client := http.Client{Timeout: time.Second * 5}
 	log.Println(dU.String())
 	resp, err := client.Get(dU.String())
@@ -81,12 +82,7 @@ func (d *DictionaryCommand) Execute(command *messages.CommandPacket) ([]*message
 	}
 
 	reply := fmt.Sprintf("%s:\n[%s](%s)\n%s", dictionaryResponse[0].Word, dictionaryResponse[0].Phonetics[0].Text, dictionaryResponse[0].Phonetics[0].Audio, meaningText)
-	return []*messages.BotPacket{
-		{
-			Timestamp: timestamppb.Now(),
-			Message:   reply,
-			Recipient: command.GetUser(),
-			Private:   command.GetPrivate(),
-		},
+	return []*domain.ClientMessage{
+		domain.NewClientMessage(reply, command.Sender(), command.Private()),
 	}, nil
 }

@@ -4,12 +4,13 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/raf924/bot/pkg/bot/command"
-	messages "github.com/raf924/connector-api/pkg/gen"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/raf924/bot/pkg/domain"
 	"net/http"
 	"net/url"
 	"strings"
 )
+
+var _ command.Command = (*WeatherCommand)(nil)
 
 const defaultDegreeType = "C"
 const maxDays = 3
@@ -53,24 +54,25 @@ func (w *WeatherCommand) Aliases() []string {
 	return []string{"w"}
 }
 
-func (w *WeatherCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
-	if len(command.Args) == 0 {
+func (w *WeatherCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
+	if len(command.Args()) == 0 {
 		return nil, nil
 	}
 	wUrl, _ := url.Parse(w.weatherUrl.String())
 	q := wUrl.Query()
-	lastArg := strings.ToLower(command.Args[len(command.Args)-1])
+	args := command.Args()
+	lastArg := strings.ToLower(args[len(args)-1])
 	var degreeType string
-	switch strings.ToLower(command.Args[len(command.Args)-1]) {
+	switch strings.ToLower(lastArg) {
 	case "f":
 	case "c":
 		degreeType = strings.ToUpper(lastArg)
-		command.Args = command.Args[:len(command.Args)-1]
+		args = args[:len(args)-1]
 	default:
 		degreeType = defaultDegreeType
 	}
 	q.Set("weadegreetype", degreeType)
-	q.Set("weasearchstr", strings.Join(command.Args, " "))
+	q.Set("weasearchstr", strings.Join(args, " "))
 	wUrl.RawQuery = q.Encode()
 	resp, err := http.Get(wUrl.String())
 	if err != nil {
@@ -88,12 +90,7 @@ func (w *WeatherCommand) Execute(command *messages.CommandPacket) ([]*messages.B
 		}
 		text += fmt.Sprintf("%s: %0.1f°%s to %0.1f°%s - %s\n", forecast.Day, forecast.Low, degreeType, forecast.High, degreeType, forecast.Sky)
 	}
-	return []*messages.BotPacket{
-		{
-			Timestamp: timestamppb.Now(),
-			Message:   text,
-			Recipient: command.User,
-			Private:   command.GetPrivate(),
-		},
+	return []*domain.ClientMessage{
+		domain.NewClientMessage(text, command.Sender(), command.Private()),
 	}, nil
 }

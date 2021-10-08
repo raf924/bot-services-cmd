@@ -5,8 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/raf924/bot/pkg/bot/command"
-	messages "github.com/raf924/connector-api/pkg/gen"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/raf924/bot/pkg/domain"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"time"
 )
+
+var _ command.Command = (*WikiCommand)(nil)
 
 type WikiSearchResponse struct {
 	XMLName xml.Name `xml:"api"`
@@ -142,8 +143,8 @@ func (w *WikiCommand) extract(pageId int) (*WikiExtractResponse, error) {
 	return &extractResponse, nil
 }
 
-func (w *WikiCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
-	searchResponse, err := w.search(strings.Join(command.GetArgs(), " "))
+func (w *WikiCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
+	searchResponse, err := w.search(strings.Join(command.Args(), " "))
 	if err != nil {
 		return nil, err
 	}
@@ -162,12 +163,7 @@ func (w *WikiCommand) Execute(command *messages.CommandPacket) ([]*messages.BotP
 	summary := extractResponse.Query.Pages[0].Page.Extract
 	link := infoResponse.Query.Pages[0].Page.Url
 	reply := fmt.Sprintf("[%s](%s)\n>%s", title, link, summary)
-	return []*messages.BotPacket{
-		{
-			Timestamp: timestamppb.Now(),
-			Message:   reply,
-			Recipient: command.GetUser(),
-			Private:   command.GetPrivate(),
-		},
+	return []*domain.ClientMessage{
+		domain.NewClientMessage(reply, command.Sender(), command.Private()),
 	}, nil
 }

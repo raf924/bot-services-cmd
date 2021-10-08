@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/raf924/bot/pkg/bot/command"
-	messages "github.com/raf924/connector-api/pkg/gen"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/raf924/bot/pkg/domain"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"time"
 )
+
+var _ command.Command = (*JokeCommand)(nil)
 
 type joke struct {
 	Kind string `json:"kind"`
@@ -89,7 +90,7 @@ func (j *JokeCommand) fetchDadJoke() (string, error) {
 	return string(b), nil
 }
 
-func (j *JokeCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
+func (j *JokeCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
 	var jokeSources = []func() (string, error){j.fetchDadJoke, j.fetchFromReddit}
 	rand.Seed(time.Now().Unix())
 	err := fmt.Errorf("no joke source chosen")
@@ -105,12 +106,7 @@ func (j *JokeCommand) Execute(command *messages.CommandPacket) ([]*messages.BotP
 		return nil, err
 	}
 
-	return []*messages.BotPacket{
-		{
-			Timestamp: timestamppb.Now(),
-			Message:   joke,
-			Recipient: command.GetUser(),
-			Private:   command.GetPrivate(),
-		},
+	return []*domain.ClientMessage{
+		domain.NewClientMessage(joke, command.Sender(), command.Private()),
 	}, nil
 }

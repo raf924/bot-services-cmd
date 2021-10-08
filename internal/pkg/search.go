@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/raf924/bot/pkg/bot/command"
-	messages "github.com/raf924/connector-api/pkg/gen"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/raf924/bot/pkg/domain"
 	"net/http"
 	"net/url"
 	"strings"
 )
+
+var _ command.Command = (*SearchCommand)(nil)
 
 type SearchResponse struct {
 	Data struct {
@@ -40,8 +41,8 @@ func (s *SearchCommand) Aliases() []string {
 	return []string{"s", "g", "google"}
 }
 
-func (s *SearchCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
-	searchTerms := strings.TrimSpace(command.ArgString)
+func (s *SearchCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
+	searchTerms := strings.TrimSpace(command.ArgString())
 	searchUrl, _ := url.Parse("https://api.qwant.com/api/search/web?locale=en_us&count=3&t=web&uiv=4")
 	searchQuery := searchUrl.Query()
 	searchQuery.Set("q", searchTerms)
@@ -66,10 +67,7 @@ func (s *SearchCommand) Execute(command *messages.CommandPacket) ([]*messages.Bo
 	for _, item := range searchResponse.Data.Result.Items {
 		message += fmt.Sprintf("%s %s\n%s\n\n", item.Title, item.Url, item.Description)
 	}
-	return []*messages.BotPacket{{
-		Timestamp: timestamppb.Now(),
-		Message:   message,
-		Recipient: command.GetUser(),
-		Private:   command.GetPrivate(),
-	}}, nil
+	return []*domain.ClientMessage{
+		domain.NewClientMessage(message, command.Sender(), command.Private()),
+	}, nil
 }

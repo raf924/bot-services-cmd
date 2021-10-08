@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"github.com/gocolly/colly/v2"
 	"github.com/raf924/bot/pkg/bot/command"
-	messages "github.com/raf924/connector-api/pkg/gen"
+	"github.com/raf924/bot/pkg/domain"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"regexp"
 )
+
+var _ command.Command = (*YoutubeCommand)(nil)
 
 var ytRegex = regexp.MustCompile(`(?i)(?:youtube\.com/\S*(?:(?:/e(?:mbed))?/|watch\?(?:\S*?&?v=))|youtu\.be/)([a-zA-Z0-9_-]{6,11})`)
 
@@ -67,28 +68,25 @@ func (y *YoutubeCommand) Aliases() []string {
 	return []string{"yt"}
 }
 
-func (y *YoutubeCommand) Execute(command *messages.CommandPacket) ([]*messages.BotPacket, error) {
+func (y *YoutubeCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
 	return nil, nil
 }
 
-func (y *YoutubeCommand) OnChat(message *messages.MessagePacket) ([]*messages.BotPacket, error) {
-	if !ytRegex.MatchString(message.GetMessage()) {
+func (y *YoutubeCommand) OnChat(message *domain.ChatMessage) ([]*domain.ClientMessage, error) {
+	if !ytRegex.MatchString(message.Message()) {
 		return nil, nil
 	}
-	title, err := y.getter(ytRegex.FindAllStringSubmatch(message.GetMessage(), -1)[0][1])
+	title, err := y.getter(ytRegex.FindAllStringSubmatch(message.Message(), -1)[0][1])
 	if err != nil {
 		return nil, err
 	}
-	var recipient *messages.User
-	if message.GetPrivate() {
-		recipient = message.GetUser()
+	var recipient *domain.User
+	if message.Private() {
+		recipient = message.Sender()
 	}
-	return []*messages.BotPacket{&messages.BotPacket{
-		Timestamp: timestamppb.Now(),
-		Message:   fmt.Sprintf("Video: %s", title),
-		Recipient: recipient,
-		Private:   message.GetPrivate(),
-	}}, nil
+	return []*domain.ClientMessage{
+		domain.NewClientMessage(fmt.Sprintf("Video: %s", title), recipient, message.Private()),
+	}, nil
 }
 
 func (y *YoutubeCommand) IgnoreSelf() bool {
