@@ -33,6 +33,9 @@ func (y *YoutubeCommand) getByApi(videoId string) (string, error) {
 		log.Println(err)
 		return y.getByScraping(videoId)
 	}
+	if len(resp.Items) == 0 {
+		return "", fmt.Errorf("no video found with id: %s", videoId)
+	}
 	return resp.Items[0].Snippet.Title, nil
 }
 
@@ -68,7 +71,7 @@ func (y *YoutubeCommand) Aliases() []string {
 	return []string{"yt"}
 }
 
-func (y *YoutubeCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
+func (y *YoutubeCommand) Execute(*domain.CommandMessage) ([]*domain.ClientMessage, error) {
 	return nil, nil
 }
 
