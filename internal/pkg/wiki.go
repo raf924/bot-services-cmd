@@ -49,7 +49,7 @@ type WikiExtractResponse struct {
 }
 
 type WikiCommand struct {
-	command.NoOpCommand
+	command.NoOpInterceptor
 	wikiUrl *url.URL
 }
 

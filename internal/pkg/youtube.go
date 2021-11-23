@@ -17,7 +17,7 @@ var _ command.Command = (*YoutubeCommand)(nil)
 var ytRegex = regexp.MustCompile(`(?i)(?:youtube\.com/\S*(?:(?:/e(?:mbed))?/|watch\?(?:\S*?&?v=))|youtu\.be/)([a-zA-Z0-9_-]{6,11})`)
 
 type YoutubeCommand struct {
-	command.NoOpCommand
+	command.NoOpInterceptor
 	getter func(videoId string) (string, error)
 	apiKey string
 }

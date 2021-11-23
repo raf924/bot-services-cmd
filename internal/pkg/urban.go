@@ -24,7 +24,7 @@ type urbanResponse struct {
 }
 
 type UrbanCommand struct {
-	command.NoOpCommand
+	command.NoOpInterceptor
 	urbanRequest *http.Request
 }
 

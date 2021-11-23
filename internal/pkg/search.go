@@ -26,7 +26,7 @@ type SearchResponse struct {
 }
 
 type SearchCommand struct {
-	command.NoOpCommand
+	command.NoOpInterceptor
 }
 
 func (s *SearchCommand) Init(command.Executor) error {

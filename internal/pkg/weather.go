@@ -36,7 +36,7 @@ type weatherResponse struct {
 }
 
 type WeatherCommand struct {
-	command.NoOpCommand
+	command.NoOpInterceptor
 	weatherUrl *url.URL
 }
 

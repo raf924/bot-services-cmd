@@ -32,7 +32,7 @@ type DictionaryResponse []struct {
 }
 
 type DictionaryCommand struct {
-	command.NoOpCommand
+	command.NoOpInterceptor
 	dictionaryUrl *url.URL
 }
 
