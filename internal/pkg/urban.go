@@ -3,8 +3,8 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/raf924/bot/pkg/bot/command"
-	"github.com/raf924/bot/pkg/domain"
+	"github.com/raf924/connector-sdk/command"
+	"github.com/raf924/connector-sdk/domain"
 	"math"
 	"net/http"
 	"net/url"
@@ -28,7 +28,7 @@ type UrbanCommand struct {
 	urbanRequest *http.Request
 }
 
-func (u *UrbanCommand) Init(bot command.Executor) error {
+func (u *UrbanCommand) Init(command.Executor) error {
 	urbanURL, _ := url.Parse("http://api.urbandictionary.com/v0/define")
 	urbanRequest, err := http.NewRequest("GET", urbanURL.String(), nil)
 	if err != nil {

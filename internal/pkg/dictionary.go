@@ -3,8 +3,8 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/raf924/bot/pkg/bot/command"
-	"github.com/raf924/bot/pkg/domain"
+	"github.com/raf924/connector-sdk/command"
+	"github.com/raf924/connector-sdk/domain"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -36,7 +36,7 @@ type DictionaryCommand struct {
 	dictionaryUrl *url.URL
 }
 
-func (d *DictionaryCommand) Init(bot command.Executor) error {
+func (d *DictionaryCommand) Init(command.Executor) error {
 	dU, err := url.Parse("https://api.dictionaryapi.dev")
 	if err != nil {
 		return err

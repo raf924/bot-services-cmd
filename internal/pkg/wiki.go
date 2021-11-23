@@ -4,8 +4,8 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/raf924/bot/pkg/bot/command"
-	"github.com/raf924/bot/pkg/domain"
+	"github.com/raf924/connector-sdk/command"
+	"github.com/raf924/connector-sdk/domain"
 	"log"
 	"net/http"
 	"net/url"
@@ -53,7 +53,7 @@ type WikiCommand struct {
 	wikiUrl *url.URL
 }
 
-func (w *WikiCommand) Init(bot command.Executor) error {
+func (w *WikiCommand) Init(command.Executor) error {
 	wikiUrl, err := url.Parse("https://en.wikipedia.org/w/api.php?action=query&format=xml")
 	if err != nil {
 		return err

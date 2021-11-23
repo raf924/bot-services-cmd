@@ -3,8 +3,8 @@ package pkg
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/raf924/bot/pkg/bot/command"
-	"github.com/raf924/bot/pkg/domain"
+	"github.com/raf924/connector-sdk/command"
+	"github.com/raf924/connector-sdk/domain"
 	"net/http"
 	"net/url"
 	"strings"
@@ -40,7 +40,7 @@ type WeatherCommand struct {
 	weatherUrl *url.URL
 }
 
-func (w *WeatherCommand) Init(bot command.Executor) error {
+func (w *WeatherCommand) Init(command.Executor) error {
 	var err error
 	w.weatherUrl, err = url.Parse("http://weather.service.msn.com/find.aspx?src=outlook")
 	return err

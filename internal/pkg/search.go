@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/raf924/bot/pkg/bot/command"
-	"github.com/raf924/bot/pkg/domain"
+	"github.com/raf924/connector-sdk/command"
+	"github.com/raf924/connector-sdk/domain"
 	"net/http"
 	"net/url"
 	"strings"
@@ -29,7 +29,7 @@ type SearchCommand struct {
 	command.NoOpCommand
 }
 
-func (s *SearchCommand) Init(bot command.Executor) error {
+func (s *SearchCommand) Init(command.Executor) error {
 	return nil
 }
 
