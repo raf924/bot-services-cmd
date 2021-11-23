@@ -1,4 +1,4 @@
-module github.com/raf924/bot-services-cmd
+module github.com/raf924/bot-services-cmd/v2
 
 go 1.17
 

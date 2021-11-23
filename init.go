@@ -1,7 +1,7 @@
 package bot_services_cmd
 
 import (
-	"github.com/raf924/bot-services-cmd/internal/pkg"
+	"github.com/raf924/bot-services-cmd/v2/internal/pkg"
 	"github.com/raf924/connector-sdk/command"
 )
 
