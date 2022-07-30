@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/raf924/connector-sdk/command"
 	"github.com/raf924/connector-sdk/domain"
@@ -13,13 +12,37 @@ import (
 
 var _ command.Command = (*SearchCommand)(nil)
 
+type MainlineItem struct {
+	Title           string        `json:"title"`
+	Favicon         string        `json:"favicon"`
+	Url             string        `json:"url"`
+	UrlPingSuffix   string        `json:"urlPingSuffix,omitempty"`
+	Source          string        `json:"source"`
+	Desc            string        `json:"desc"`
+	Id              string        `json:"_id"`
+	Type            string        `json:"_type,omitempty"`
+	AdType          string        `json:"ad_type,omitempty"`
+	Position        int           `json:"position,omitempty"`
+	RawPosition     string        `json:"raw_position,omitempty"`
+	ImpressionToken string        `json:"impressionToken,omitempty"`
+	Images          []interface{} `json:"images,omitempty"`
+	ActionItems     []interface{} `json:"actionItems,omitempty"`
+	PriceItems      []interface{} `json:"priceItems,omitempty"`
+	Links           []interface{} `json:"links,omitempty"`
+}
+
+type MainlineResult struct {
+	Type  string         `json:"type"`
+	Count int            `json:"count"`
+	Items []MainlineItem `json:"items"`
+}
+
 type SearchResponse struct {
-	Data struct {
+	Status string `json:"status"`
+	Data   struct {
 		Result struct {
-			Items []struct {
-				Title       string `json:"title"`
-				Url         string `json:"url"`
-				Description string `json:"desc"`
+			Items struct {
+				Mainline []MainlineResult `json:"mainline"`
 			} `json:"items"`
 		} `json:"result"`
 	} `json:"data"`
@@ -41,9 +64,22 @@ func (s *SearchCommand) Aliases() []string {
 	return []string{"s", "g", "google"}
 }
 
+func findWebResults(result []MainlineResult) ([]MainlineResult, error) {
+	var webResults []MainlineResult
+	for _, item := range result {
+		if item.Type == "web" {
+			webResults = append(webResults, item)
+		}
+	}
+	if len(webResults) == 0 {
+		return nil, fmt.Errorf("no web result found")
+	}
+	return webResults, nil
+}
+
 func (s *SearchCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientMessage, error) {
 	searchTerms := strings.TrimSpace(command.ArgString())
-	searchUrl, _ := url.Parse("https://api.qwant.com/api/search/web?locale=en_us&count=3&t=web&uiv=4")
+	searchUrl, _ := url.Parse("https://api.qwant.com/v3/search/web?origin=suggest&count=10&offset=0&safesearch=1&locale=en_US")
 	searchQuery := searchUrl.Query()
 	searchQuery.Set("q", searchTerms)
 	searchUrl.RawQuery = searchQuery.Encode()
@@ -56,7 +92,7 @@ func (s *SearchCommand) Execute(command *domain.CommandMessage) ([]*domain.Clien
 		return nil, err
 	}
 	if res.StatusCode != 200 {
-		return nil, errors.New("error")
+		return nil, fmt.Errorf("call is error %d, %s", res.StatusCode, res.Status)
 	}
 	var searchResponse SearchResponse
 	err = json.NewDecoder(res.Body).Decode(&searchResponse)
@@ -64,8 +100,22 @@ func (s *SearchCommand) Execute(command *domain.CommandMessage) ([]*domain.Clien
 		return nil, err
 	}
 	message := ""
-	for _, item := range searchResponse.Data.Result.Items {
-		message += fmt.Sprintf("%s %s\n%s\n\n", item.Title, item.Url, item.Description)
+	webResults, err := findWebResults(searchResponse.Data.Result.Items.Mainline)
+	if err != nil {
+		return nil, err
+	}
+	count := 0
+	for _, webResult := range webResults {
+		for _, item := range webResult.Items {
+			message += fmt.Sprintf(">#### [%s](%s)\n%s\n\n", item.Title, item.Url, item.Desc)
+			count += 1
+			if count == 5 {
+				break
+			}
+		}
+		if count == 5 {
+			break
+		}
 	}
 	return []*domain.ClientMessage{
 		domain.NewClientMessage(message, command.Sender(), command.Private()),
