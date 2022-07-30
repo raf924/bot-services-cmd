@@ -22,54 +22,8 @@ type timeResponse struct {
 	TimeZone         string `json:"timeZone"`
 	CurrentLocalTime string `json:"currentLocalTime"`
 	CurrentUtcOffset struct {
-		Seconds      int   `json:"seconds"`
-		Milliseconds int   `json:"milliseconds"`
-		Ticks        int64 `json:"ticks"`
-		Nanoseconds  int64 `json:"nanoseconds"`
+		Seconds int `json:"seconds"`
 	} `json:"currentUtcOffset"`
-	StandardUtcOffset struct {
-		Seconds      int   `json:"seconds"`
-		Milliseconds int   `json:"milliseconds"`
-		Ticks        int64 `json:"ticks"`
-		Nanoseconds  int64 `json:"nanoseconds"`
-	} `json:"standardUtcOffset"`
-	HasDayLightSaving      bool `json:"hasDayLightSaving"`
-	IsDayLightSavingActive bool `json:"isDayLightSavingActive"`
-	DstInterval            struct {
-		DstName        string `json:"dstName"`
-		DstOffsetToUtc struct {
-			Seconds      int   `json:"seconds"`
-			Milliseconds int   `json:"milliseconds"`
-			Ticks        int64 `json:"ticks"`
-			Nanoseconds  int64 `json:"nanoseconds"`
-		} `json:"dstOffsetToUtc"`
-		DstOffsetToStandardTime struct {
-			Seconds      int   `json:"seconds"`
-			Milliseconds int   `json:"milliseconds"`
-			Ticks        int64 `json:"ticks"`
-			Nanoseconds  int64 `json:"nanoseconds"`
-		} `json:"dstOffsetToStandardTime"`
-		DstStart    time.Time `json:"dstStart"`
-		DstEnd      time.Time `json:"dstEnd"`
-		DstDuration struct {
-			Days                 int   `json:"days"`
-			NanosecondOfDay      int   `json:"nanosecondOfDay"`
-			Hours                int   `json:"hours"`
-			Minutes              int   `json:"minutes"`
-			Seconds              int   `json:"seconds"`
-			Milliseconds         int   `json:"milliseconds"`
-			SubsecondTicks       int   `json:"subsecondTicks"`
-			SubsecondNanoseconds int   `json:"subsecondNanoseconds"`
-			BclCompatibleTicks   int64 `json:"bclCompatibleTicks"`
-			TotalDays            int   `json:"totalDays"`
-			TotalHours           int   `json:"totalHours"`
-			TotalMinutes         int   `json:"totalMinutes"`
-			TotalSeconds         int   `json:"totalSeconds"`
-			TotalMilliseconds    int64 `json:"totalMilliseconds"`
-			TotalTicks           int64 `json:"totalTicks"`
-			TotalNanoseconds     int64 `json:"totalNanoseconds"`
-		} `json:"dstDuration"`
-	} `json:"dstInterval"`
 }
 
 type geocodingResponse struct {
@@ -140,8 +94,7 @@ type weatherResponse struct {
 type degree string
 
 const (
-	Metrics degree = "C"
-
+	Metrics  degree = "C"
 	Imperial degree = "F"
 )
 
@@ -244,6 +197,9 @@ func (w *WeatherCommand) fetchLocation(search string) (*location, error) {
 	err = json.NewDecoder(response.Body).Decode(&geocodingResponses)
 	if err != nil {
 		return nil, err
+	}
+	if len(geocodingResponses) == 0 {
+		return nil, fmt.Errorf("incorrect output")
 	}
 	displayName := geocodingResponses[0].DisplayName
 	parts := strings.Split(displayName, ",")
