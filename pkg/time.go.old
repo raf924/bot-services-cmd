@@ -18,7 +18,7 @@ type timeResponse struct {
 	Weather []struct {
 		Location string  `xml:"weatherlocationname,attr"`
 		Timezone float64 `xml:"timezone,attr"`
-	} `xml:"weather"`
+	} `xml:"weatherForDay"`
 }
 
 type TimeCommand struct {
@@ -43,11 +43,11 @@ func (t *TimeCommand) Execute(command *domain.CommandMessage) ([]*domain.ClientM
 	wUrl.RawQuery = q.Encode()
 	resp, err := http.Get(wUrl.String())
 	if err != nil {
-		return nil, fmt.Errorf("get weather error: %s", err.Error())
+		return nil, fmt.Errorf("get weatherForDay error: %s", err.Error())
 	}
 	var timeData timeResponse
 	if err = xml.NewDecoder(resp.Body).Decode(&timeData); err != nil {
-		return nil, fmt.Errorf("parse weather error: %s", err)
+		return nil, fmt.Errorf("parse weatherForDay error: %s", err)
 	}
 	locTime := time.Now().UTC().In(time.FixedZone("", int(timeData.Weather[0].Timezone*60*60)))
 	return []*domain.ClientMessage{
